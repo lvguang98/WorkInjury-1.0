@@ -1,0 +1,14 @@
+{
+  "database": {
+    "path": "C:\\Users\\Administrator\\PycharmProjects\\工伤助手\\data\\database.db",
+    "type": "sqlite"
+  },
+  "ui": {
+    "theme": "light",
+    "font_size": 12,
+    "window_size": [
+      800,
+      600
+    ]
+  }
+}
