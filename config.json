@@ -1,6 +1,6 @@
 {
   "database": {
-    "path": "G:\\project_gszs\\data\\database.db",
+    "path": "G:\\WorkInjury-1.0\\data\\database.db",
     "type": "sqlite"
   },
   "ui": {
