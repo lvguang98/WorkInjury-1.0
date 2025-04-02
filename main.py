@@ -1,6 +1,6 @@
+
 import sys
 from PyQt5.QtWidgets import QApplication
-
 from config import Config
 from utils.logger import setup_logging
 from ui.main_window import MainWindow

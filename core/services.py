@@ -1,7 +1,6 @@
 import sqlite3
 from contextlib import contextmanager
 from typing import Iterator, List
-
 from core.models import Person, InjuredPerson, Case
 from core.exceptions import DatabaseError
 

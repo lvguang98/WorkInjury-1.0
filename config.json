@@ -1,6 +1,6 @@
 {
   "database": {
-    "path": "C:\\Users\\Administrator\\PycharmProjects\\工伤助手\\data\\database.db",
+    "path": "G:\\project_gszs\\data\\database.db",
     "type": "sqlite"
   },
   "ui": {
