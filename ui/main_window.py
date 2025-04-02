@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import (
     QPushButton, QMessageBox
 )
 from PyQt5.QtCore import Qt
-
 from config import Config
 from core.services import CaseService
 

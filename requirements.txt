@@ -1,4 +1,6 @@
-PyQt5==5.15.9
+PyQt5==5.15.4
+pyqt5-tools==5.15.4.3.2
+pyqt5-plugins==5.15.4.2.2
 pywin32==306
 python-docx==0.8.11
 docxtpl==0.16.5
