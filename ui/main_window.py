@@ -33,28 +33,13 @@ class MainWindow(QMainWindow):
         self.status_label = QLabel("就绪")
         self.status_label.setAlignment(Qt.AlignCenter)
 
-        self.new_case_btn = QPushButton("新建案件")
-        self.list_cases_btn = QPushButton("案件列表")
-
         layout.addWidget(self.title_label)
-        layout.addStretch(1)
-        layout.addWidget(self.new_case_btn)
-        layout.addWidget(self.list_cases_btn)
         layout.addStretch(1)
         layout.addWidget(self.status_label)
 
     def _connect_signals(self):
         """连接信号槽"""
-        self.new_case_btn.clicked.connect(self._on_new_case)
-        self.list_cases_btn.clicked.connect(self._on_list_cases)
-
-    def _on_new_case(self):
-        """新建案件按钮点击事件"""
-        QMessageBox.information(self, "提示", "新建案件功能将在后续实现")
-
-    def _on_list_cases(self):
-        """案件列表按钮点击事件"""
-        QMessageBox.information(self, "提示", "案件列表功能将在后续实现")
+        pass
 
     def closeEvent(self, event):
         """窗口关闭事件"""
