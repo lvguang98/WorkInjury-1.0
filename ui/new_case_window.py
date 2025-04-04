@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QDialog, QFormLayout, QLineEdit, QPushButton,
                              QHBoxLayout, QWidget, QRadioButton, QButtonGroup,
-                             QComboBox, QMessageBox)
+                             QComboBox, QMessageBox, QLabel)
 from PyQt5.QtCore import Qt
 
 
@@ -15,7 +15,7 @@ class NewCaseWindow(QDialog):
         super().__init__(parent)
         self.setWindowTitle("新建工伤案件")
         self.setWindowFlags(self.windowFlags() | Qt.WindowMinMaxButtonsHint)
-        self.resize(450, 350)
+        self.resize(500, 350)
         self._init_ui()
         self._connect_identity_signals()
 
@@ -77,10 +77,25 @@ class NewCaseWindow(QDialog):
         self.phone_edit = QLineEdit(self)
         self.position_edit = QLineEdit(self)
 
-        layout.addRow("受伤职工姓名:", self.name_edit)
+        name_label = QLabel("姓  名:")  # 使用中文全角空格(U+3000)
+        name_label.setStyleSheet("font-family: 'Microsoft YaHei';")
+        layout.addRow(name_label, self.name_edit)
         layout.addRow("身份证号:", self.id_edit)
         layout.addRow("联系电话:", self.phone_edit)
         layout.addRow("工作岗位:", self.position_edit)
+
+        self.law_combo = QComboBox(self)
+        self.law_combo.setEditable(False)
+        laws = [
+            "条例1：",
+            "条例2：",
+            "条例3：",
+            "条例4：",
+            "条例5：",
+            "条例6："
+        ]
+        self.law_combo.addItems(laws)
+        layout.addRow("适用条例:", self.law_combo)
 
         # 4. 提交按钮
         submit_btn = QPushButton("提交", self)
