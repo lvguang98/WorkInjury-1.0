@@ -11,4 +11,3 @@ pyqt5-plugins==5.15.4.2.2 --no-deps
 pywin32==306
 python-docx==0.8.11
 docxtpl==0.16.5
-pandas==2.0.3

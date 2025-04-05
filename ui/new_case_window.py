@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import (QDialog, QFormLayout, QLineEdit, QPushButton,
                              QHBoxLayout, QWidget, QRadioButton, QButtonGroup,
-                             QComboBox, QMessageBox, QLabel)
-from PyQt5.QtCore import Qt
+                             QComboBox, QMessageBox, QLabel, QCompleter)
+from PyQt5.QtCore import Qt, QStringListModel
+from openpyxl import Workbook, load_workbook  # 替换 pandas
+import os
 
 
 class NewCaseWindow(QDialog):
@@ -15,9 +17,37 @@ class NewCaseWindow(QDialog):
         super().__init__(parent)
         self.setWindowTitle("新建工伤案件")
         self.setWindowFlags(self.windowFlags() | Qt.WindowMinMaxButtonsHint)
-        self.resize(500, 350)
+        self.resize(600, 500)
+        self.excel_file = "company_data.xlsx"
+        self._init_excel()  # 初始化 Excel 文件（改用 openpyxl）
         self._init_ui()
         self._connect_identity_signals()
+
+    def _init_excel(self):
+        """初始化 Excel 数据文件（使用 openpyxl）"""
+        if not os.path.exists(self.excel_file):
+            # 创建新的 Excel 文件，包含三个 sheets
+            wb = Workbook()
+            # 默认第一个 sheet 命名为 "公司名称"
+            ws_company = wb.active
+            ws_company.title = "公司名称"
+            ws_company.append(["示例公司A", "示例公司B"])
+
+            # 添加 "用人单位" sheet
+            ws_employer = wb.create_sheet("用人单位")
+            ws_employer.append(["部门A", "部门B"])
+
+            # 添加 "派驻单位" sheet
+            ws_dispatched = wb.create_sheet("派驻单位")
+            ws_dispatched.append(["分部1", "分部2"])
+
+            wb.save(self.excel_file)
+
+        # 加载数据
+        self.wb = load_workbook(self.excel_file)
+        self.company_list = list(self.wb["公司名称"].iter_rows(values_only=True))[0]
+        self.employer_list = list(self.wb["用人单位"].iter_rows(values_only=True))[0]
+        self.dispatched_list = list(self.wb["派驻单位"].iter_rows(values_only=True))[0]
 
     def _connect_identity_signals(self):
         """连接身份切换的信号"""
@@ -97,6 +127,30 @@ class NewCaseWindow(QDialog):
         self.law_combo.addItems(laws)
         layout.addRow("适用条例:", self.law_combo)
 
+        # 公司名称
+        self.company_edit = QLineEdit(self)
+        self._setup_completer(self.company_edit, self.company_list)
+        btn_save_company = QPushButton("保存", self)
+        btn_save_company.clicked.connect(lambda: self._save_company_data("公司名称"))
+        layout.addRow("公司名称:", self._create_input_with_button(self.company_edit, btn_save_company))
+
+        # 用人单位
+        self.employer_edit = QLineEdit(self)
+        self._setup_completer(self.employer_edit, self.employer_list)
+        btn_save_employer = QPushButton("保存", self)
+        btn_save_employer.clicked.connect(lambda: self._save_company_data("用人单位"))
+        layout.addRow("用人单位:", self._create_input_with_button(self.employer_edit, btn_save_employer))
+
+        # 派驻单位
+        self.dispatched_edit = QLineEdit(self)
+        self._setup_completer(self.dispatched_edit, self.dispatched_list)
+        btn_save_dispatched = QPushButton("保存", self)
+        btn_save_dispatched.clicked.connect(lambda: self._save_company_data("派驻单位"))
+        layout.addRow("派驻单位:", self._create_input_with_button(self.dispatched_edit, btn_save_dispatched))
+
+        # 加载首行数据
+        self._load_first_row_data()
+
         # 4. 提交按钮
         submit_btn = QPushButton("提交", self)
         submit_btn.clicked.connect(self._on_submit)
@@ -122,3 +176,74 @@ class NewCaseWindow(QDialog):
 
         print("案件数据:", data)
         self.accept()
+
+    def _create_input_with_button(self, line_edit, button):
+        """创建带按钮的水平布局"""
+        widget = QWidget(self)
+        hbox = QHBoxLayout(widget)
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.addWidget(line_edit)
+        hbox.addWidget(button)
+        return widget
+
+    def _setup_completer(self, line_edit, item_list):
+        """设置输入框的自动补全"""
+        completer = QCompleter(item_list, self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchContains)
+        line_edit.setCompleter(completer)
+
+    def _load_first_row_data(self):
+        """加载 Excel 第一行数据到输入框（改用 openpyxl）"""
+        # 公司名称
+        company_sheet = self.wb["公司名称"]
+        first_company = company_sheet.cell(row=1, column=1).value
+        if first_company:
+            self.company_edit.setText(str(first_company))
+
+        # 用人单位
+        employer_sheet = self.wb["用人单位"]
+        first_employer = employer_sheet.cell(row=1, column=1).value
+        if first_employer:
+            self.employer_edit.setText(str(first_employer))
+
+        # 派驻单位
+        dispatched_sheet = self.wb["派驻单位"]
+        first_dispatched = dispatched_sheet.cell(row=1, column=1).value
+        if first_dispatched:
+            self.dispatched_edit.setText(str(first_dispatched))
+
+
+    def _save_company_data(self, column_name):
+        """保存数据到 Excel（改用 openpyxl）"""
+        if column_name == "公司名称":
+            value = self.company_edit.text().strip()
+            sheet = self.wb["公司名称"]
+            data_list = self.company_list
+        elif column_name == "用人单位":
+            value = self.employer_edit.text().strip()
+            sheet = self.wb["用人单位"]
+            data_list = self.employer_list
+        else:
+            value = self.dispatched_edit.text().strip()
+            sheet = self.wb["派驻单位"]
+            data_list = self.dispatched_list
+
+        if not value:
+            QMessageBox.warning(self, "错误", f"{column_name}不能为空！")
+            return
+
+        if value in data_list:
+            QMessageBox.information(self, "提示", f"该{column_name}已存在！")
+            return
+
+        try:
+            # 追加新数据到对应 sheet
+            sheet.append([value])
+            self.wb.save(self.excel_file)
+
+            # 更新内存中的数据列表
+            data_list.append(value)
+            QMessageBox.information(self, "成功", f"{column_name}已保存！")
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"保存失败: {str(e)}")
