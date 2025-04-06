@@ -1,13 +1,14 @@
-# requirements.txt
-# PyQt5 核心组件（强制使用预编译轮文件）
-PyQt5==5.15.9 --only-binary=:all:
-PyQt5-Qt5==5.15.2 --only-binary=:all:
-PyQt5-sip==12.11.0 --only-binary=:all:
+# 核心组件
+PyQt5==5.15.4
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.11.0
 
-# 配套工具（忽略依赖检查）
-pyqt5-tools==5.15.4.3.2 --no-deps
-pyqt5-plugins==5.15.4.2.2 --no-deps
+# 开发工具
+pyqt5-tools==5.15.4.3.2
+pyqt5-plugins==5.15.4.2.2
 
+# 其他依赖
 pywin32==306
 python-docx==0.8.11
 docxtpl==0.16.5
+openpyxl==3.0.10
