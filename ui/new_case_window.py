@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, QStringListModel
 from openpyxl import Workbook, load_workbook
 from datetime import datetime
 import os
+from utils.config import Config  # 新增导入
 
 
 class NewCaseWindow(QDialog):
@@ -13,17 +14,18 @@ class NewCaseWindow(QDialog):
         2: "证人",
         3: "法人"
     }
-    case_counter = 1  # 类变量，用于生成序号
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.config = Config()  # 初始化配置管理器
         self.case_id = None  # 案件编号
         self.record_time = None  # 笔录时间
         self.setWindowTitle("新建工伤案件")
+        self.setWindowTitle("新建工伤案件")
         self.setWindowFlags(self.windowFlags() | Qt.WindowMinMaxButtonsHint)
         self.resize(600, 500)
-        self.excel_file = "company_data.xlsx"
-        self._init_excel()  # 初始化 Excel 文件（改用 openpyxl）
+        self.excel_file = os.path.join("utils", "company_data.xlsx")  # 更新路径
+        self._init_excel()
         self._init_ui()
         self._connect_identity_signals()
 
@@ -182,11 +184,10 @@ class NewCaseWindow(QDialog):
     def _on_submit(self):
         """获取并验证所有字段数据"""
         # 生成案件编号 (首次提交时生成)
+        """获取并验证所有字段数据"""
+        # 生成案件编号 (首次提交时生成)
         if self.case_id is None:
-            now = datetime.now()
-            date_str = now.strftime("%Y%m%d")
-            self.case_id = f"CASE-{date_str}-{NewCaseWindow.case_counter:03d}"
-            NewCaseWindow.case_counter += 1
+            self.case_id = self.config.generate_case_id()  # 使用Config生成编号
 
         # 生成笔录时间（每次提交都更新）
         self.record_time = datetime.now().strftime("%Y年%m月%d日%H时%M分")
@@ -194,8 +195,8 @@ class NewCaseWindow(QDialog):
         identity = self.IDENTITY_MAP.get(self.identity_group.checkedId(), "本人")
 
         data = {
-            "case_id": self.case_id,  # 案件编号
-            "record_time": self.record_time,  # 笔录时间
+            "case_id": self.case_id,
+            "record_time": self.record_time,
             "status": self.case_status.currentText(),
             "identity": identity,
             "name": self.name_edit.text().strip(),

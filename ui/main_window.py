@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QLabel,
                              QAction)
 
-from config import Config
+from utils.config import Config
 from core.services import CaseService
 from ui.new_case_window import NewCaseWindow
 

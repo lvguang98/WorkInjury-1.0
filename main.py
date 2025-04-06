@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from ui.main_window import MainWindow  # 更新导入路径
-from config import Config
+from utils.config import Config
 from utils.logger import setup_logging
 
 
