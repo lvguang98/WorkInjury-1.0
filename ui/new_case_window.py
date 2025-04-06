@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QDialog, QFormLayout, QLineEdit, QPushButton,
                              QComboBox, QMessageBox, QLabel, QCompleter)
 from PyQt5.QtCore import Qt, QStringListModel
 from openpyxl import Workbook, load_workbook
+from datetime import datetime
 import os
 
 
@@ -12,9 +13,12 @@ class NewCaseWindow(QDialog):
         2: "证人",
         3: "法人"
     }
+    case_counter = 1  # 类变量，用于生成序号
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.case_id = None  # 案件编号
+        self.record_time = None  # 笔录时间
         self.setWindowTitle("新建工伤案件")
         self.setWindowFlags(self.windowFlags() | Qt.WindowMinMaxButtonsHint)
         self.resize(600, 500)
@@ -177,18 +181,34 @@ class NewCaseWindow(QDialog):
 
     def _on_submit(self):
         """获取并验证所有字段数据"""
+        # 生成案件编号 (首次提交时生成)
+        if self.case_id is None:
+            now = datetime.now()
+            date_str = now.strftime("%Y%m%d")
+            self.case_id = f"CASE-{date_str}-{NewCaseWindow.case_counter:03d}"
+            NewCaseWindow.case_counter += 1
+
+        # 生成笔录时间（每次提交都更新）
+        self.record_time = datetime.now().strftime("%Y年%m月%d日%H时%M分")
+
         identity = self.IDENTITY_MAP.get(self.identity_group.checkedId(), "本人")
 
         data = {
+            "case_id": self.case_id,  # 案件编号
+            "record_time": self.record_time,  # 笔录时间
             "status": self.case_status.currentText(),
             "identity": identity,
             "name": self.name_edit.text().strip(),
             "id": self.id_edit.text().strip(),
             "phone": self.phone_edit.text().strip(),
-            "position": self.position_edit.text().strip()
+            "position": self.position_edit.text().strip(),
+            "company": self.company_edit.text().strip(),
+            "employer": self.employer_edit.text().strip(),
+            "dispatched": self.dispatched_edit.text().strip(),
+            "law": self.law_combo.currentText()
         }
 
-        # 简单验证示例
+        # 验证
         if not data["name"]:
             QMessageBox.warning(self, "错误", "姓名不能为空")
             return
