@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QDialog, QFormLayout, QLineEdit, QPushButton,
                              QHBoxLayout, QWidget, QRadioButton, QButtonGroup,
                              QComboBox, QMessageBox, QLabel, QCompleter)
 from PyQt5.QtCore import Qt, QStringListModel
-from openpyxl import Workbook, load_workbook  # 替换 pandas
+from openpyxl import Workbook, load_workbook
 import os
 
 
@@ -24,30 +24,49 @@ class NewCaseWindow(QDialog):
         self._connect_identity_signals()
 
     def _init_excel(self):
-        """初始化 Excel 数据文件（使用 openpyxl）"""
+        """初始化Excel数据文件（竖向排列）"""
         if not os.path.exists(self.excel_file):
-            # 创建新的 Excel 文件，包含三个 sheets
+            # 创建新的Excel文件，数据竖向排列
             wb = Workbook()
-            # 默认第一个 sheet 命名为 "公司名称"
+
+            # 公司名称（A列）
             ws_company = wb.active
             ws_company.title = "公司名称"
-            ws_company.append(["示例公司A", "示例公司B"])
+            ws_company.append(["示例公司A"])  # A1
+            ws_company.append(["示例公司B"])  # A2
 
-            # 添加 "用人单位" sheet
+            # 用人单位（B列）
             ws_employer = wb.create_sheet("用人单位")
-            ws_employer.append(["部门A", "部门B"])
+            ws_employer.append(["部门A"])  # A1
+            ws_employer.append(["部门B"])  # A2
 
-            # 添加 "派驻单位" sheet
+            # 派驻单位（C列）
             ws_dispatched = wb.create_sheet("派驻单位")
-            ws_dispatched.append(["分部1", "分部2"])
+            ws_dispatched.append(["分部1"])  # A1
+            ws_dispatched.append(["分部2"])  # A2
 
             wb.save(self.excel_file)
 
-        # 加载数据
+        # 加载数据（竖向读取）
         self.wb = load_workbook(self.excel_file)
-        self.company_list = list(self.wb["公司名称"].iter_rows(values_only=True))[0]
-        self.employer_list = list(self.wb["用人单位"].iter_rows(values_only=True))[0]
-        self.dispatched_list = list(self.wb["派驻单位"].iter_rows(values_only=True))[0]
+
+        # 公司名称（A列所有非空单元格）
+        self.company_list = [
+            row[0].value for row in self.wb["公司名称"].iter_rows(min_col=1, max_col=1)
+            if row[0].value is not None
+        ]
+
+        # 用人单位（A列所有非空单元格）
+        self.employer_list = [
+            row[0].value for row in self.wb["用人单位"].iter_rows(min_col=1, max_col=1)
+            if row[0].value is not None
+        ]
+
+        # 派驻单位（A列所有非空单元格）
+        self.dispatched_list = [
+            row[0].value for row in self.wb["派驻单位"].iter_rows(min_col=1, max_col=1)
+            if row[0].value is not None
+        ]
 
     def _connect_identity_signals(self):
         """连接身份切换的信号"""
@@ -194,28 +213,24 @@ class NewCaseWindow(QDialog):
         line_edit.setCompleter(completer)
 
     def _load_first_row_data(self):
-        """加载 Excel 第一行数据到输入框（改用 openpyxl）"""
-        # 公司名称
+        """加载Excel第一行数据到输入框（竖向读取）"""
+        # 公司名称（A1）
         company_sheet = self.wb["公司名称"]
-        first_company = company_sheet.cell(row=1, column=1).value
-        if first_company:
-            self.company_edit.setText(str(first_company))
+        first_company = company_sheet["A1"].value if company_sheet["A1"].value else ""
+        self.company_edit.setText(str(first_company))
 
-        # 用人单位
+        # 用人单位（A1）
         employer_sheet = self.wb["用人单位"]
-        first_employer = employer_sheet.cell(row=1, column=1).value
-        if first_employer:
-            self.employer_edit.setText(str(first_employer))
+        first_employer = employer_sheet["A1"].value if employer_sheet["A1"].value else ""
+        self.employer_edit.setText(str(first_employer))
 
-        # 派驻单位
+        # 派驻单位（A1）
         dispatched_sheet = self.wb["派驻单位"]
-        first_dispatched = dispatched_sheet.cell(row=1, column=1).value
-        if first_dispatched:
-            self.dispatched_edit.setText(str(first_dispatched))
+        first_dispatched = dispatched_sheet["A1"].value if dispatched_sheet["A1"].value else ""
+        self.dispatched_edit.setText(str(first_dispatched))
 
 
     def _save_company_data(self, column_name):
-        """保存数据到 Excel（改用 openpyxl）"""
         if column_name == "公司名称":
             value = self.company_edit.text().strip()
             sheet = self.wb["公司名称"]
@@ -238,7 +253,7 @@ class NewCaseWindow(QDialog):
             return
 
         try:
-            # 追加新数据到对应 sheet
+            # 竖向追加数据（直接 append 会自动换行）
             sheet.append([value])
             self.wb.save(self.excel_file)
 
