@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from config import Config
+from ui.main_window import MainWindow  # 更新导入路径
+from utils.config import Config
 from utils.logger import setup_logging
-from ui.main_window import MainWindow
 
 
 def main():
@@ -23,4 +23,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    app = QApplication(sys.argv)
+    config = Config()
+    window = MainWindow(config)
+    window.show()
+    sys.exit(app.exec_())

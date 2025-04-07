@@ -3,15 +3,19 @@ from contextlib import contextmanager
 from typing import Iterator, List
 from core.models import Person, InjuredPerson, Case
 from core.exceptions import DatabaseError
-
+import os
 class CaseService:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self._init_db()
+        print(f"尝试打开数据库路径: {self.db_path}")
+        print(f"路径是否存在: {os.path.exists(self.db_path)}")
 
     @contextmanager
     def _get_connection(self) -> Iterator[sqlite3.Connection]:
         """获取数据库连接"""
+        print(f"尝试打开数据库路径: {self.db_path}")
+        print(f"路径是否存在: {os.path.exists(self.db_path)}")
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         try:
