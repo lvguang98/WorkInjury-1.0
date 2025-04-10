@@ -99,6 +99,12 @@ class NewCaseWindow(QDialog):
         layout = QFormLayout()
         self.setLayout(layout)
 
+        # 0. 案件编号显示（添加在案件状态之前）
+        self.case_id = self.config.generate_case_id()  # 生成案件编号
+        self.case_id_label = QLabel(f"案件编号: {self.case_id}", self)
+        self.case_id_label.setStyleSheet("font-weight: bold;")
+        layout.addRow(self.case_id_label)
+
         # 1. 案件状态选择
         self.case_status = QComboBox(self)
         self.case_status.addItems(["正常案件", "个人案件", "死亡案件"])

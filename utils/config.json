@@ -1,6 +1,6 @@
 {
   "database": {
-    "path": "G:\\WorkInjury-1.0\\data\\database.db",
+    "path": "G:\\project_gszs\\data\\database.db",
     "type": "sqlite"
   },
   "ui": {
@@ -12,5 +12,5 @@
     ]
   },
   "case_counter": 2,
-  "last_case_date": "20250406"
+  "last_case_date": "20250410"
 }
